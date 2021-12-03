@@ -7,25 +7,42 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RentlKendaraan.Models;
 
-namespace RentlKendaraan.Views
+namespace RentalKendaraan.Controllers
 {
-    public class KendaraansController : Controller
+    public class JaminansController : Controller
     {
         private readonly RentKendaraanContext _context;
 
-        public KendaraansController(RentKendaraanContext context)
+        public JaminansController(RentKendaraanContext context)
         {
             _context = context;
         }
 
-        // GET: Kendaraans
-        public async Task<IActionResult> Index()
+        // GET: Jaminans
+        public async Task<IActionResult> Index(string ktsd, string searchString)
         {
-            var rentKendaraanContext = _context.Kendaraans.Include(k => k.IdJenisKendaraanNavigation);
-            return View(await rentKendaraanContext.ToListAsync());
+            var ktsdList = new List<string>();
+            var ktsdQuery = from d in _context.Jaminans orderby d.NamaJaminan select d.NamaJaminan;
+
+            ktsdList.AddRange(ktsdQuery.Distinct());
+            ViewBag.ktsd = new SelectList(ktsdList);
+            var menu = from m in _context.Jaminans select m;
+
+            if (!string.IsNullOrEmpty(ktsd))
+            {
+                menu = menu.Where(x => x.NamaJaminan == ktsd);
+            }
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                menu = menu.Where(s => s.NamaJaminan.Contains(searchString));
+
+            }
+
+            return View(await menu.ToListAsync());
         }
 
-        // GET: Kendaraans/Details/5
+        // GET: Jaminans/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,42 +50,39 @@ namespace RentlKendaraan.Views
                 return NotFound();
             }
 
-            var kendaraan = await _context.Kendaraans
-                .Include(k => k.IdJenisKendaraanNavigation)
-                .FirstOrDefaultAsync(m => m.IdKendaraan == id);
-            if (kendaraan == null)
+            var jaminan = await _context.Jaminans
+                .FirstOrDefaultAsync(m => m.IdJaminan == id);
+            if (jaminan == null)
             {
                 return NotFound();
             }
 
-            return View(kendaraan);
+            return View(jaminan);
         }
 
-        // GET: Kendaraans/Create
+        // GET: Jaminans/Create
         public IActionResult Create()
         {
-            ViewData["IdJenisKendaraan"] = new SelectList(_context.JenisKendaraans, "IdJenisKendaraan", "IdJenisKendaraan");
             return View();
         }
 
-        // POST: Kendaraans/Create
+        // POST: Jaminans/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdKendaraan,NamaKendaraan,NoPolisi,NoStnk,IdJenisKendaraan,Ketersediaan")] Kendaraan kendaraan)
+        public async Task<IActionResult> Create([Bind("IdJaminan,NamaJaminan")] Jaminan jaminan)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(kendaraan);
+                _context.Add(jaminan);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdJenisKendaraan"] = new SelectList(_context.JenisKendaraans, "IdJenisKendaraan", "IdJenisKendaraan", kendaraan.IdJenisKendaraan);
-            return View(kendaraan);
+            return View(jaminan);
         }
 
-        // GET: Kendaraans/Edit/5
+        // GET: Jaminans/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -76,23 +90,22 @@ namespace RentlKendaraan.Views
                 return NotFound();
             }
 
-            var kendaraan = await _context.Kendaraans.FindAsync(id);
-            if (kendaraan == null)
+            var jaminan = await _context.Jaminans.FindAsync(id);
+            if (jaminan == null)
             {
                 return NotFound();
             }
-            ViewData["IdJenisKendaraan"] = new SelectList(_context.JenisKendaraans, "IdJenisKendaraan", "IdJenisKendaraan", kendaraan.IdJenisKendaraan);
-            return View(kendaraan);
+            return View(jaminan);
         }
 
-        // POST: Kendaraans/Edit/5
+        // POST: Jaminans/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdKendaraan,NamaKendaraan,NoPolisi,NoStnk,IdJenisKendaraan,Ketersediaan")] Kendaraan kendaraan)
+        public async Task<IActionResult> Edit(int id, [Bind("IdJaminan,NamaJaminan")] Jaminan jaminan)
         {
-            if (id != kendaraan.IdKendaraan)
+            if (id != jaminan.IdJaminan)
             {
                 return NotFound();
             }
@@ -101,12 +114,12 @@ namespace RentlKendaraan.Views
             {
                 try
                 {
-                    _context.Update(kendaraan);
+                    _context.Update(jaminan);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!KendaraanExists(kendaraan.IdKendaraan))
+                    if (!JaminanExists(jaminan.IdJaminan))
                     {
                         return NotFound();
                     }
@@ -117,11 +130,10 @@ namespace RentlKendaraan.Views
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdJenisKendaraan"] = new SelectList(_context.JenisKendaraans, "IdJenisKendaraan", "IdJenisKendaraan", kendaraan.IdJenisKendaraan);
-            return View(kendaraan);
+            return View(jaminan);
         }
 
-        // GET: Kendaraans/Delete/5
+        // GET: Jaminans/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -129,31 +141,30 @@ namespace RentlKendaraan.Views
                 return NotFound();
             }
 
-            var kendaraan = await _context.Kendaraans
-                .Include(k => k.IdJenisKendaraanNavigation)
-                .FirstOrDefaultAsync(m => m.IdKendaraan == id);
-            if (kendaraan == null)
+            var jaminan = await _context.Jaminans
+                .FirstOrDefaultAsync(m => m.IdJaminan == id);
+            if (jaminan == null)
             {
                 return NotFound();
             }
 
-            return View(kendaraan);
+            return View(jaminan);
         }
 
-        // POST: Kendaraans/Delete/5
+        // POST: Jaminans/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var kendaraan = await _context.Kendaraans.FindAsync(id);
-            _context.Kendaraans.Remove(kendaraan);
+            var jaminan = await _context.Jaminans.FindAsync(id);
+            _context.Jaminans.Remove(jaminan);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool KendaraanExists(int id)
+        private bool JaminanExists(int id)
         {
-            return _context.Kendaraans.Any(e => e.IdKendaraan == id);
+            return _context.Jaminans.Any(e => e.IdJaminan == id);
         }
     }
 }

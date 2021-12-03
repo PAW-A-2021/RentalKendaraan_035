@@ -7,24 +7,41 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RentlKendaraan.Models;
 
-namespace RentlKendaraan.Views
+namespace RentalKendaraan.Controllers
 {
-    public class JaminansController : Controller
+    public class GendersController : Controller
     {
         private readonly RentKendaraanContext _context;
 
-        public JaminansController(RentKendaraanContext context)
+        public GendersController(RentKendaraanContext context)
         {
             _context = context;
         }
 
-        // GET: Jaminans
-        public async Task<IActionResult> Index()
+        // GET: Genders
+        public async Task<IActionResult> Index(string ktsd, string searchString)
         {
-            return View(await _context.Jaminans.ToListAsync());
+            var ktsdList = new List<string>();
+            var ktsdQuery = from d in _context.Genders orderby d.NamaGender select d.NamaGender.ToString();
+
+            ktsdList.AddRange(ktsdQuery.Distinct());
+            ViewBag.ktsd = new SelectList(ktsdList);
+            var menu = from m in _context.Genders select m;
+
+            if (!string.IsNullOrEmpty(ktsd))
+            {
+                menu = menu.Where(x => x.NamaGender.ToString() == ktsd);
+            }
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                menu = menu.Where(s => s.NamaGender.Contains(searchString));
+            }
+
+            return View(await menu.ToListAsync());
         }
 
-        // GET: Jaminans/Details/5
+        // GET: Genders/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -32,39 +49,39 @@ namespace RentlKendaraan.Views
                 return NotFound();
             }
 
-            var jaminan = await _context.Jaminans
-                .FirstOrDefaultAsync(m => m.IdJaminan == id);
-            if (jaminan == null)
+            var gender = await _context.Genders
+                .FirstOrDefaultAsync(m => m.IdGender == id);
+            if (gender == null)
             {
                 return NotFound();
             }
 
-            return View(jaminan);
+            return View(gender);
         }
 
-        // GET: Jaminans/Create
+        // GET: Genders/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Jaminans/Create
+        // POST: Genders/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdJaminan,NamaJaminan")] Jaminan jaminan)
+        public async Task<IActionResult> Create([Bind("IdGender,NamaGender")] Gender gender)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(jaminan);
+                _context.Add(gender);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(jaminan);
+            return View(gender);
         }
 
-        // GET: Jaminans/Edit/5
+        // GET: Genders/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -72,22 +89,22 @@ namespace RentlKendaraan.Views
                 return NotFound();
             }
 
-            var jaminan = await _context.Jaminans.FindAsync(id);
-            if (jaminan == null)
+            var gender = await _context.Genders.FindAsync(id);
+            if (gender == null)
             {
                 return NotFound();
             }
-            return View(jaminan);
+            return View(gender);
         }
 
-        // POST: Jaminans/Edit/5
+        // POST: Genders/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdJaminan,NamaJaminan")] Jaminan jaminan)
+        public async Task<IActionResult> Edit(int id, [Bind("IdGender,NamaGender")] Gender gender)
         {
-            if (id != jaminan.IdJaminan)
+            if (id != gender.IdGender)
             {
                 return NotFound();
             }
@@ -96,12 +113,12 @@ namespace RentlKendaraan.Views
             {
                 try
                 {
-                    _context.Update(jaminan);
+                    _context.Update(gender);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!JaminanExists(jaminan.IdJaminan))
+                    if (!GenderExists(gender.IdGender))
                     {
                         return NotFound();
                     }
@@ -112,10 +129,10 @@ namespace RentlKendaraan.Views
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(jaminan);
+            return View(gender);
         }
 
-        // GET: Jaminans/Delete/5
+        // GET: Genders/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -123,30 +140,30 @@ namespace RentlKendaraan.Views
                 return NotFound();
             }
 
-            var jaminan = await _context.Jaminans
-                .FirstOrDefaultAsync(m => m.IdJaminan == id);
-            if (jaminan == null)
+            var gender = await _context.Genders
+                .FirstOrDefaultAsync(m => m.IdGender == id);
+            if (gender == null)
             {
                 return NotFound();
             }
 
-            return View(jaminan);
+            return View(gender);
         }
 
-        // POST: Jaminans/Delete/5
+        // POST: Genders/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var jaminan = await _context.Jaminans.FindAsync(id);
-            _context.Jaminans.Remove(jaminan);
+            var gender = await _context.Genders.FindAsync(id);
+            _context.Genders.Remove(gender);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool JaminanExists(int id)
+        private bool GenderExists(int id)
         {
-            return _context.Jaminans.Any(e => e.IdJaminan == id);
+            return _context.Genders.Any(e => e.IdGender == id);
         }
     }
 }
