@@ -26,6 +26,7 @@ namespace RentalKendaraan.Controllers
 
             ktsdList.AddRange(ktsdQuery.Distinct());
             ViewBag.ktsd = new SelectList(ktsdList);
+
             var menu = from m in _context.Kendaraans.Include(k => k.IdJenisKendaraanNavigation) select m;
 
             if (!string.IsNullOrEmpty(ktsd))
