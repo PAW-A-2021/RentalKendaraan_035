@@ -12,8 +12,8 @@
 @using (Html.BeginForm("Index", "Peminjamen", FormMethod.Get))
 {
     <p>
-        Ketersediaans: @Html.DropDownList("ktsd", "Pilih Peminjaman")
-        Cari Data: @Html.TextBox("searchString")
+        Biaya : @Html.DropDownList("ktsd", "Pilih Biaya")
+        Cari Data : @Html.TextBox("searchString")
         <input type="submit" value="Filter" />
     </p>
 }
@@ -27,13 +27,13 @@
                 @Html.DisplayName("Biaya")
             </th>
             <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Id Customer</a>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Nama Customers</a>
             </th>
             <th>
-                @Html.DisplayName("Id Jaminan")
+                @Html.DisplayName("ID Jaminan")
             </th>
             <th>
-                @Html.DisplayName("Id Kendaraan")
+                @Html.DisplayName("ID Kendaraan")
             </th>
             <th></th>
         </tr>
@@ -49,18 +49,18 @@
                     @Html.DisplayFor(modelItem => item.Biaya)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.IdCustomerNavigation.IdCustomer)
+                    @Html.DisplayFor(modelItem => item.IdCustomerNavigation.NamaCustomer)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.IdJaminanNavigation.IdJaminan)
+                    @Html.DisplayFor(modelItem => item.IdJaminanNavigation.NamaJaminan)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.IdKendaraanNavigation.IdKendaraan)
+                    @Html.DisplayFor(modelItem => item.IdKendaraanNavigation.NamaKendaraan)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.IdPeminjaman"><i class="fa fa-marker fa-lg"></i></a> |
+                    <a asp-action="Edit" asp-route-id="@item.IdPeminjaman"><i class="fas fa-marker fa-lg"></i></a> |
                     <a asp-action="Details" asp-route-id="@item.IdPeminjaman"><i class="fas fa-list"></i></a> |
-                    <a asp-action="Delete" asp-route-id="@item.IdPeminjaman"><i class="fa fa-trash-alt fa-lg"></i></a>
+                    <a asp-action="Delete" asp-route-id="@item.IdPeminjaman"><i class="fas fa-trash fa-lg"></i></a>
                 </td>
             </tr>
         }
@@ -70,7 +70,6 @@
     var prevDisabled = !Model.HasilPreviousPage ? "disabled" : "";
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
-
 <a asp-action="Index"
    asp-route-sortOrder="@ViewData["CurrentSort"]"
    asp-route-pageNumber="@(Model.PageIndex - 1)"
@@ -78,7 +77,6 @@
    class="btn btn-default @prevDisabled">
     Previous
 </a>
-
 <a asp-action="Index"
    asp-route-sortOrder="@ViewData["CurrentSort"]"
    asp-route-pageNumber="@(Model.PageIndex + 1)"
