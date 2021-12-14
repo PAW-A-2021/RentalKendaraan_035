@@ -1,32 +1,30 @@
-﻿@model IEnumerable<RentlKendaraan.Models.Pengembalian>
+﻿@model PaginatedList<RentlKendaraan.Models.Pengembalian>
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index Pengembalian</h1>
+<h1>Index</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-
 @using (Html.BeginForm("Index", "Pengembalians", FormMethod.Get))
 {
     <p>
-        Ketersediaan : @Html.DropDownList("ktsd", "Pilih Denda")
-        Cari Data : @Html.TextBox("searchString")
+        Ketersediaans: @Html.DropDownList("ktsd", "Pilih ")
+        Cari Data: @Html.TextBox("searchString")
         <input type="submit" value="Filter" />
     </p>
 }
-
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayName("Tanggal Pengembalian")
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["DateSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Tanggal Pengembalian</a>
             </th>
             <th>
-                @Html.DisplayName("Denda")
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Denda</a>
             </th>
             <th>
                 @Html.DisplayName("Id Kondisi")
@@ -62,3 +60,24 @@
         }
     </tbody>
 </table>
+
+@{
+    var prevDisabled = !Model.HasilPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>
